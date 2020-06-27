@@ -1,0 +1,30 @@
+---
+- name: create paths and copy files
+  block:
+    - name: create paths
+      file:
+        path: "{{ item.1.dest | dirname }}"
+        state: directory
+      become: yes
+      become_user: "{{ item.0.user }}"
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_template }}"
+      tags:
+        - create_paths
+
+    - name: process templates
+      template:
+        src: "{{ item.1.src }}"
+        dest: "{{ item.1.dest }}"
+        mode: preserve
+      become: yes
+      become_user: "{{ item.0.user }}"
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_template }}"
+      tags:
+        - process_templates
+
+  tags:
+    - setup

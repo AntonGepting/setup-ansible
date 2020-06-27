@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  role_name: setup
+  author: Anton Gepting
+  description: Deploy dotfiles and setup applications
+  company:
+
+  license: MIT
+
+  min_ansible_version: 2.4
+
+  galaxy_tags:
+    - setup
+
+dependencies: []

@@ -1,0 +1,26 @@
+---
+- name: remove files if they exist
+  block:
+    - name: check if files exist
+      stat:
+        path: "{{ item.1.src }}"
+      register: src_list_stat
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_remove }}"
+      tags:
+        - exists
+
+    - name: remove files
+      file:
+        path: "{{ item.item.1.src }}"
+        state: absent
+      become: yes
+      become_user: "{{ item.item.0.user }}"
+      with_items:
+        - "{{ src_list_stat.results }}"
+      when: item.stat.exists
+      tags:
+        - remove_files
+  tags:
+    - setup

@@ -1,0 +1,25 @@
+---
+- name: exec files if they exist
+  block:
+    - name: check if files exist
+      stat:
+        path: "{{ item.1.src }}"
+      register: src_list_stat
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_exec }}"
+      tags:
+        - exists
+
+    - name: exec files
+      shell:
+        cmd: "{{ item.item.1.cmd }}"
+      become: yes
+      become_user: "{{ item.item.0.user }}"
+      with_items:
+        - "{{ src_list_stat.results }}"
+      when: item.stat.exists
+      tags:
+        - exec_files
+  tags:
+    - setup

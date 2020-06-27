@@ -1,0 +1,40 @@
+---
+- name: create paths and copy files
+  block:
+    - name: create paths locally
+      local_action:
+        module: file
+        path: "{{ local_build_dir }}/{{ inventory_hostname }}/{{ item.0.user }}/{{ role_name }}"
+        state: directory
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_copy }}"
+      tags:
+        - local_actions
+
+    - name: process templates locally
+      local_action:
+        module: template
+        src: "{{ item.1.src }}"
+        dest: "{{ local_build_dir }}/{{ inventory_hostname }}/{{ item.0.user }}/{{ role_name }}/{{ item.1.dest | basename }}"
+        mode: preserve
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_template }}"
+      tags:
+        - local_actions
+
+    - name: copy files locally
+      local_action:
+        module: copy
+        src: "{{ item.1.src }}"
+        dest: "{{ local_build_dir }}/{{ inventory_hostname }}/{{ item.0.user }}/{{ role_name }}/{{ item.1.dest | basename }}"
+        mode: preserve
+      with_nested:
+        - "{{ users }}"
+        - "{{ role_copy }}"
+      tags:
+        - local_actions
+
+  tags:
+    - setup

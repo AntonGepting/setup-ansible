@@ -1,0 +1,56 @@
+---
+- name: ensure packages are installed
+  apt:
+    name: "{{ role_packages }}"
+    state: present
+  become: yes
+  become_user: root
+  when: (role_packages is defined) and (role_packages | length > 0)
+  tags:
+    - setup
+    - install
+
+- name: include template.yml
+  include_tasks: template.yml
+  when: (role_template is defined) and (role_template | length > 0)
+  tags:
+    - setup
+    - process_templates
+    - create_paths
+
+- name: include copy.yml
+  include_tasks: copy.yml
+  when: (role_copy is defined) and (role_copy | length > 0)
+  tags:
+    - setup
+    - copy_files
+    - create_paths
+
+- name: include remove.yml
+  include_tasks: remove.yml
+  when: (role_remove is defined) and (role_remove | length > 0)
+  tags:
+    - setup
+    - remove_files
+
+- name: include download.yml
+  include_tasks: download.yml
+  when: (role_download is defined) and (role_download | length > 0)
+  tags:
+    - setup
+    - download_files
+
+- name: include exec.yml
+  include_tasks: exec.yml
+  when: (role_exec is defined) and (role_exec | length > 0)
+  tags:
+    - setup
+    - exec_files
+
+- name: include local_actions.yml
+  include_tasks: local_actions.yml
+  when: ((role_template is defined) and (role_template | length > 0)) or
+        ((role_copy is defined) and (role_copy | length > 0))
+  tags:
+    - setup
+    - local_actions
